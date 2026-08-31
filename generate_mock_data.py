@@ -126,7 +126,7 @@ for i in range(1000):
 
 for row in finance_header[:15]:
     row["document_date"] = fake.date_between(start_date="-2y", end_date = "-1y")
-fake.past_date
+
 
 df_finance_header = pd.DataFrame(finance_header)
 df_finance_line_item = pd.DataFrame(finance_line_item)
