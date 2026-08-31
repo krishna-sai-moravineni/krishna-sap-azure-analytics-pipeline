@@ -1,6 +1,7 @@
 import pandas as pd
 import faker
 import random
+import os
 
 fake = faker.Faker()
 
@@ -10,6 +11,14 @@ sample_customers = [{
                      "city": fake.city(), 
                      "country": fake.country()
                     } for i in range(1000)]
+
+messy_customers = [
+    {"customer_id": "CUST9001", "customer_name": "Acme Corp", "city": "Springfield", "country": "USA"},
+    {"customer_id": "CUST9002", "customer_name": "Acme Corporation", "city": "Springfield", "country": "USA"},
+    {"customer_id": "CUST9003", "customer_name": "Acme Corp.", "city": "Springfield", "country": "USA"},
+]
+
+sample_customers.extend(messy_customers)
 
 df_customers = pd.DataFrame(sample_customers)
 #print(df_customers)
@@ -77,7 +86,61 @@ for i in range(1000):
         
 
 df_sales_header = pd.DataFrame(sales_order_header)
-df_sales_line_items = pd.DataFrame(sales_order_item)
+df_sales_line_item = pd.DataFrame(sales_order_item)
 
-print(df_sales_header.head(10))
-print(df_sales_line_items.head(100))
+#print(df_sales_header.head(10))
+#print(df_sales_line_items.head(100))
+
+
+document_types = ["Vendor Invoice", "Payment", "Credit Memo", "Journal Entry"]
+posting_keys = ["Debit", "Credit"]
+
+finance_header = []
+finance_line_item = []
+
+vendors_list = df_vendors["vendor_id"].to_list()
+
+for i in range(1000):
+
+    posting_id = f"DOC{i:06d}"
+
+    curr_finance_header = {
+                            "posting_id": posting_id,
+                            "vendor_id": random.choice(vendors_list),
+                            "document_date": fake.date_this_year(),
+                            "document_type": random.choice(document_types)
+                          }
+
+    finance_header.append(curr_finance_header)
+
+    for j in range(random.randint(1, 4)):
+        curr_finance_line_item = {
+                                    "posting_id": posting_id,
+                                    "line_number": (j+1) * 10,
+                                    "posting_key": random.choice(posting_keys),
+                                    "amount": round(random.uniform(50, 20000), 2)
+                                 }
+
+        finance_line_item.append(curr_finance_line_item)
+
+
+for row in finance_header[:15]:
+    row["document_date"] = fake.date_between(start_date="-2y", end_date = "-1y")
+fake.past_date
+
+df_finance_header = pd.DataFrame(finance_header)
+df_finance_line_item = pd.DataFrame(finance_line_item)
+
+#print(df_finance_header.head(10))
+#print(df_finance_line_item.head(10))
+
+
+os.makedirs("data/raw")
+
+df_customers.to_csv(path_or_buf="data/raw/customer_master.csv", index=False)
+df_vendors.to_csv(path_or_buf="data/raw/vendor_master.csv", index=False)
+df_materials.to_csv(path_or_buf="data/raw/material_master.csv", index=False)
+df_sales_header.to_csv(path_or_buf="data/raw/sales_order_header.csv", index=False)
+df_sales_line_item.to_csv(path_or_buf="data/raw/sales_order_line.csv", index=False)
+df_finance_header.to_csv(path_or_buf="data/raw/finance_header.csv", index=False)
+df_sales_line_item.to_csv(path_or_buf="data/raw/finance_line.csv", index=False)
