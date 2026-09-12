@@ -11,10 +11,11 @@ def create_update_bronze_watermark(cursor, table_name, timestamp, is_active):
     upsert_query = """INSERT INTO bronze_watermarks (table_name, last_watermark, is_active)
                      VALUES (?, ?, ?)
                      ON CONFLICT(table_name)
-                     DO UPDATE SET last_watermark = ?"""
+                     DO UPDATE SET last_watermark = ?,
+                                   is_active = ?"""
 
     try:
-        cursor.execute(upsert_query, (table_name, timestamp, is_active, timestamp,))
+        cursor.execute(upsert_query, (table_name, timestamp, is_active, timestamp, is_active))
         return True
         
     except sl.Error as er:
