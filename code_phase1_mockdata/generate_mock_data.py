@@ -63,7 +63,8 @@ for i in range(1000):
                     "order_id": order_id, 
                     "customer_id": random.choice(cust_ids), 
                     "order_date": fake.date_this_year(), 
-                    "order_status": random.choice(order_statuses)
+                    "order_status": random.choice(order_statuses),
+                    "last_updated_datetime": fake.date_time_between(start_date="-30d", end_date="-1d")
                  }
     sales_order_header.append(header_row)
 
@@ -108,7 +109,8 @@ for i in range(1000):
                             "posting_id": posting_id,
                             "vendor_id": random.choice(vendors_list),
                             "document_date": fake.date_this_year(),
-                            "document_type": random.choice(document_types)
+                            "document_type": random.choice(document_types),
+                            "last_changed_datetime": fake.date_time_between(start_date="-30d", end_date="-1d")
                           }
 
     finance_header.append(curr_finance_header)
@@ -134,8 +136,7 @@ df_finance_line_item = pd.DataFrame(finance_line_item)
 #print(df_finance_header.head(10))
 #print(df_finance_line_item.head(10))
 
-
-os.makedirs("data/raw")
+os.makedirs("data/raw", exist_ok=True)
 
 df_customers.to_csv(path_or_buf="data/raw/customer_master.csv", index=False)
 df_vendors.to_csv(path_or_buf="data/raw/vendor_master.csv", index=False)
